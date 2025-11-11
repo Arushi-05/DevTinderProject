@@ -1,15 +1,18 @@
 const express = require('express')
+
+//const authAdmin=require('./middlewares/adminAuth')
 const app = express()
 const PORT = 8000
+const connectDB=require('./config/dataBase')
 
-app.use((req, res, next)=>{
-    console.log('Hi console!')
-    next()
-});
 
-app.get('/', (req, res)=>{
-    res.send('Hi from server response!'); 
-});
-app.listen(PORT, () => {
-    console.log(`Hi server port ${PORT}.`)
-  })
+
+
+connectDB().then(()=>{
+    console.log("DB connected!")
+    app.listen(PORT, () => {
+        console.log(`Hi server port ${PORT}.`)
+    });
+}).catch(err=>{
+    console.log(`DB not connected yet because of ${err}.`)
+})
