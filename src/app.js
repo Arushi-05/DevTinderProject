@@ -6,7 +6,6 @@ const PORT = 8000
 const connectDB = require('./config/dataBase')
 app.use(express.json())
 app.post("/signup", async (req, res) => {
-
     const user = new User(req.body)
     try {
         await user.save();
@@ -49,6 +48,24 @@ app.get("/feed", async (req, res) => {
     }
 
 })
+
+app.patch("/user", async (req, res) => {
+
+    try {
+        const updateId = req.body.userId;
+        const data=req.body;
+        const updatedUser=await User.findByIdAndUpdate(updateId,data, {returnDocument:'after', runValidators: true})
+        console.log(updatedUser)
+        res.send("Updated the user successfully.")
+        
+        
+
+    } catch (err) {
+        res.status(404).send("User data can't be updated right now, please try again.")
+      
+    }
+
+})
 app.delete("/user", async (req, res) => {
 
     try {
@@ -57,7 +74,7 @@ app.delete("/user", async (req, res) => {
         res.send("Deleted the user.")
 
     } catch (err) {
-        res.status(401).send("User can't be deleted right now, please try again.")
+        res.status(404).send("User can't be deleted right now, please try again.")
       
     }
 
