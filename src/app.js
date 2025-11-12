@@ -1,22 +1,56 @@
 const express = require('express')
 const User = require('./models/user')
-const bcrypt = require('bcrypt');
 const app = express()
 const PORT = 8000
 const { validateSignUpData } = require("./utils/validation");
+const bcrypt = require('bcrypt');
 const connectDB = require('./config/dataBase')
-app.use(express.json())
+app.use(express.json());
+
+app.post("/login", async (req, res) => {
+
+    try {
+
+        const { emailId, password } = req.body;
+
+        async function checkUser(emailId, password) {
+            //... fetch user from a db etc.
+            const user = await User.findOne({ emailId });
+            if (!user) {
+                throw new Error("Email not found.")
+            }
+            const match = await bcrypt.compare(password, user.password);
+            if (match) {
+                res.send("User Loggedin!")
+            }
+            else {
+                throw new Error("Cannot login the user. Please check credentials.")
+            }
+        }
+        await checkUser(emailId, password)
+        //const match = await bcrypt.compare(password, user.password);
+
+        // if (match) {
+        //     res.send("User Loggedin!")
+        // }
+        // else {
+        //     throw new Error("Cannot login the user. Please check credentials.")
+        // }}
+    }
+    catch (err) {
+        res.status(400).send("ERROR is: " + err.message)
+    }
+})
+
 app.post("/signup", async (req, res) => {
-    //Validation of password
+
     try {
         validateSignUpData(req);
-        
-        const {firstName,lastName, emailId,password}= req.body;
+        const { firstName, lastName, emailId, password, ...otherFields } = req.body;
         const passwordHash = await bcrypt.hash(password, 10);
         const user = new User({
-            firstName, lastName, emailId, password: passwordHash
+            firstName, lastName, emailId, password: passwordHash, ...otherFields
         })
-        
         await user.save();
         res.send("New user added successfully.")
     }
@@ -24,6 +58,7 @@ app.post("/signup", async (req, res) => {
         res.status(400).send(`Error saving the new user:${err.message}`)
     }
 })
+
 app.get("/user", async (req, res) => {
 
     const userEmailId = (req.body.emailId)
