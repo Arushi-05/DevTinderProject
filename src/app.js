@@ -1,6 +1,5 @@
 const express = require('express')
 const User = require('./models/user')
-//const authAdmin=require('./middlewares/adminAuth')
 const app = express()
 const PORT = 8000
 const connectDB = require('./config/dataBase')
@@ -49,19 +48,28 @@ app.get("/feed", async (req, res) => {
 
 })
 
-app.patch("/user", async (req, res) => {
+app.patch("/user/:userId", async (req, res) => {
 
     try {
-        const updateId = req.body.userId;
         const data=req.body;
+        const ALLOWED_UPDATES=[
+            "userId",
+            "age",
+            "gender"
+        ];
+        const isUpdatesAllowed = Object.keys(data).every((k)=>
+            ALLOWED_UPDATES.includes(k)
+        )
+        if(!isUpdatesAllowed){
+            throw new Error("Update not allowed on one of the fields.")
+        }
+        const updateId = req.params?.userId;
         const updatedUser=await User.findByIdAndUpdate(updateId,data, {returnDocument:'after', runValidators: true})
         console.log(updatedUser)
         res.send("Updated the user successfully.")
-        
-        
 
     } catch (err) {
-        res.status(404).send("User data can't be updated right now, please try again.")
+        res.status(404).send("Update failed with error: "+err.message)
       
     }
 
@@ -79,6 +87,7 @@ app.delete("/user", async (req, res) => {
     }
 
 })
+
 connectDB().then(() => {
     console.log("DB connected!")
     app.listen(PORT, () => {
