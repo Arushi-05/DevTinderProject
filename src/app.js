@@ -2,26 +2,34 @@ const express = require('express')
 const User = require('./models/user')
 const app = express()
 const PORT = 8000
-const { validateSignUpData } = require("./utils/validation");
+const jwt = require('jsonwebtoken');
+const cookieParser = require('cookie-parser')
+const { validateSignUpData, validateLoginData } = require("./utils/validation");
 const bcrypt = require('bcrypt');
-const connectDB = require('./config/dataBase')
+const connectDB = require('./config/dataBase');
+const authUser = require('./middlewares/adminAuth');
+const { get } = require('mongoose');
 app.use(express.json());
-
+app.use(cookieParser())
 app.post("/login", async (req, res) => {
 
     try {
-
+        validateLoginData(req)
         const { emailId, password } = req.body;
 
         async function checkUser(emailId, password) {
-            //... fetch user from a db etc.
+
             const user = await User.findOne({ emailId });
             if (!user) {
-                throw new Error("Email not found.")
+                throw new Error("User not found!")
             }
             const match = await bcrypt.compare(password, user.password);
             if (match) {
-                res.send("User Loggedin!")
+                
+                const token = await user.getJWT()
+                console.log("token 2:" + token)
+                res.cookie("token", token)
+                res.send("User is Loggedin successfully.")
             }
             else {
                 throw new Error("Cannot login the user. Please check credentials.")
@@ -42,6 +50,45 @@ app.post("/login", async (req, res) => {
     }
 })
 
+app.get("/user",authUser, async (req, res) => {
+    const userEmailId = (req.body.emailId)
+    try {
+        const foundUsers = await User.find({ emailId: userEmailId })
+        if (foundUsers.length === 0) {
+            res.status(401).send("user is not found.")
+        }
+        else {
+            res.send(foundUsers)
+        }
+
+    } catch (err) {
+        res.status(500).send(`${err.message}`)
+    }
+
+})
+app.get("/profile", authUser, async (req, res) => {
+
+    try {
+        const {_id}=req.user
+        const getUser = await User.findById(_id)
+        res.send(getUser)
+        // else {
+        //     const { token } = req.cookies
+        //     const decoded = jwt.verify(token, 'shhhhhAru05@');
+        //     const {emailId}=decoded
+        //     if (emailId === userEmailId) {
+        //         console.log('Cookies sent by client and that was set by server:', token)
+        //         res.send(foundUsers)
+        //     }
+    } catch (err) {
+        res.status(500).send(`${err.message}`)
+    }
+
+
+})
+    
+
+
 app.post("/signup", async (req, res) => {
 
     try {
@@ -59,23 +106,7 @@ app.post("/signup", async (req, res) => {
     }
 })
 
-app.get("/user", async (req, res) => {
 
-    const userEmailId = (req.body.emailId)
-    try {
-        const foundUsers = await User.find({ emailId: userEmailId })
-        if (foundUsers.length === 0) {
-            res.status(401).send("user is not found.")
-        }
-        else {
-            res.send(foundUsers)
-        }
-
-    } catch (err) {
-        res.status(500).send(`${err.message}`)
-    }
-
-})
 
 app.get("/feed", async (req, res) => {
     try {
