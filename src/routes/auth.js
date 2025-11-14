@@ -60,13 +60,13 @@ router.post("/login", async (req, res) => {
     }
 })
 
-router.post("/logout", authUser,async (req, res) => {
+router.post("/logout", authUser, async (req, res) => {
     const { token } = req.cookies
-    const user= req.user
+    const user = req.user
     if (!token) {
         throw new Error("Please login to logout man!")
     }
-    res.cookie("token", null,{expires:new Date(Date.now())})
+    res.cookie("token", null, { expires: new Date(Date.now()) })
     res.send(`${user.firstName} is logged out!`);
 })
 
@@ -91,10 +91,10 @@ module.exports = router;
 
 // {       
 //     "emailId": "avi@gmail.com", 
-//"password": "Avinash@30"    
+//"password": "Avinash@301"    
 
 //    "emailId": "prakhar@gmail.com",
-  //  "password": "Prakhar@123"
+//  "password": "Prakhar@12345"
 //    
 //   }
 // {
