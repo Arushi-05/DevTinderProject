@@ -13,6 +13,7 @@ app.use(cookieParser())
 const profileRouter = require('./routes/profile')
 const authRouter = require('./routes/auth')
 const requestRouter = require('./routes/request')
+
 app.use('/', authRouter)
 app.use('/', profileRouter)
 app.use('/', requestRouter)
@@ -35,19 +36,7 @@ app.get("/user", authUser, async (req, res) => {
 })
 
 
-app.delete("/user", async (req, res) => {
 
-    try {
-        const deleteId = req.body.userId;
-        const userToBeDeleted = await User.findByIdAndDelete(deleteId)
-        res.send("Deleted the user.")
-
-    } catch (err) {
-        res.status(404).send("User can't be deleted right now, please try again.")
-
-    }
-
-})
 
 connectDB().then(() => {
     console.log("DB connected!")

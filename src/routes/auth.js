@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const authUser = require('../middlewares/adminAuth');
 const { validateSignUpData, validateLoginData } = require("../utils/validation");
 const User = require('../models/user')
 const bcrypt = require('bcrypt');
@@ -59,17 +60,42 @@ router.post("/login", async (req, res) => {
     }
 })
 
-router.post("/logout", async (req, res) => {
-    res.clearCookie("token")
-    res.send(`user is logged out.`);
+router.post("/logout", authUser,async (req, res) => {
+    const { token } = req.cookies
+    const user= req.user
+    if (!token) {
+        throw new Error("Please login to logout man!")
+    }
+    res.cookie("token", null,{expires:new Date(Date.now())})
+    res.send(`${user.firstName} is logged out!`);
 })
+
+router.delete("/user", async (req, res) => {
+
+    try {
+        const deleteId = req.body.userId;
+        const userToBeDeleted = await User.findByIdAndDelete(deleteId)
+        res.send("Deleted the user.")
+
+    } catch (err) {
+        res.status(404).send("User can't be deleted right now, please try again.")
+
+    }
+
+})
+
+
 
 module.exports = router;
 
 
 // {       
-//     "emailId": "avi@gmail.com",
-//     "password": "Avinash@30"
+//     "emailId": "avi@gmail.com", 
+//"password": "Avinash@30"    
+
+//    "emailId": "prakhar@gmail.com",
+  //  "password": "Prakhar@123"
+//    
 //   }
 // {
 // "emailId": "tilak@gmail.com",

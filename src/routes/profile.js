@@ -2,7 +2,9 @@ const express = require('express');
 const authUser = require('../middlewares/adminAuth');
 const router = express.Router();
 const User = require('../models/user')
-router.get("/profile", authUser, async (req, res) => {
+const { validateProfileData } = require("../utils/validation");
+
+router.get("/profile/view", authUser, async (req, res) => {
 
     try {
         const { _id } = req.user
@@ -16,29 +18,19 @@ router.get("/profile", authUser, async (req, res) => {
 router.patch("/profile/edit", authUser, async (req, res) => {
 
     try {
+        if (!validateProfileData(req)) {
 
-        const data = req.body;
+            throw new Error("Update not allowed on one of these fields.")
 
-        const ALLOWED_UPDATES = [
-            "age",
-            "gender",
-            "skills"
-        ];
-        const isUpdatesAllowed = Object.keys(data).every((k) =>
-            ALLOWED_UPDATES.includes(k)
-        )
-        if (!isUpdatesAllowed) {
-            throw new Error("Update not allowed on one of the fields.")
-        } else {
-            const loggedInUser = req.user;
-            console.log(loggedInUser)
-            Object.keys(data).forEach((key) => {
-                loggedInUser[key] = data[key]
-            })
-            console.log(loggedInUser)
-            await loggedInUser.save();
-            res.send(`${loggedInUser.firstName} ${loggedInUser.lastName}, your profile is updated successfully.`)
         }
+        const data = req.body;
+        const loggedInUser = req.user;
+        Object.keys(data).forEach((key) => {
+            loggedInUser[key] = data[key]
+        });
+        await loggedInUser.save();
+        res.send(`${loggedInUser.firstName} ${loggedInUser.lastName}, your profile is updated successfully.`)
+
     } catch (err) {
         res.status(404).send("Update failed with error: " + err.message)
 
