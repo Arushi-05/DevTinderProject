@@ -9,18 +9,13 @@ const authUser = async (req, res, next) => {
             throw new Error("Token not found!")
         }
         const decodedObj = jwt.verify(token, 'shhhhhAru05@');
-        const {userId}=decodedObj //from token we get the userid trying to login
-        const user=req.body._id
-        //const { emailId } = decodedObj
-        //const userEmailId = (req.body.emailId)
-        if (user === userId) {
-            const foundUser = await User.findOne({ user })
-            if (!foundUser) {
-                throw new Error("User not found during auth!")
-            }
-            req.user = foundUser
-            next()
+        const { _id } = decodedObj //from token we get the _id of the logged in user
+        const foundUser = await User.findById(_id)
+        if (!foundUser) {
+            throw new Error("User not found during auth!")
         }
+        req.user = foundUser
+        next()
 
     } catch (err) {
         res.status(400).send(`${err.message}`)
