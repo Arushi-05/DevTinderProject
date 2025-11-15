@@ -44,5 +44,14 @@ userSchema.methods.getJWT = async function () {
     return token;
 }
 
+userSchema.statics.decodeToken = function (token) {
+    try {
+        const decoded = jwt.verify(token, "shhhhhAru05@");
+        return decoded;       // contains _id, name, email, etc.
+    } catch (err) {
+        throw new Error("Invalid or expired token.");
+    }
+};
+
 const User = mongoose.model('User', userSchema);
 module.exports = User;
