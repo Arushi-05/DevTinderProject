@@ -12,6 +12,12 @@ const connectionSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             required: true
         },
+        toFirstName: {
+            type: String
+        },
+        toLastName: {
+            type: String 
+        },
         status: {
             type: String,
             required: true,

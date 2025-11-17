@@ -14,7 +14,7 @@ const userSchema = new Schema({
             }
         }
     },
-    password: { type: String, required: true, trim: true },
+    password: { type: String, required: true, trim: true},
     age: { type: Number, min: 18 },
     gender: {
         type: String, lowercase: true, validate(val) {

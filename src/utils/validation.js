@@ -73,8 +73,7 @@ const validateUser = async (req) => {
         // const { _id } = decodedObj //from token we get the _id of the logged in user
         // const user= await User.findById(_id)
         // const fromUserId=user._id  //this is typeof object
-        console.log(typeof toUserId)
-        console.log(typeof fromUserId)
+       
         if(toUserId ===fromUserId.toString()){  //converting to string
             throw new Error("You cant send request to yourself!")
         }
@@ -96,8 +95,7 @@ const validateDuplicateRequest = async (req) => {
         // const user= await User.findById(_id)
         // const fromUserId=user._id   //loggedin user who sent connection req
         const toUserId = req.params.toUserId
-        console.log("fromuser: " + fromUserId)
-        console.log("toUser: " + toUserId)
+    
         const existingRequest = await ConnectionRequest.findOne({
             $or: [{ fromUserId, toUserId }, { fromUserId: toUserId, toUserId: fromUserId }]
         })

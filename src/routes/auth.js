@@ -35,11 +35,12 @@ router.post("/login", async (req, res) => {
             }
             const match = await bcrypt.compare(password, user.password);
             if (match) {
-
                 const token = await user.getJWT()
                 console.log("token 2:" + token)
                 res.cookie("token", token)
-                res.send(`${user.firstName} is loggedin now.`)
+                // const data=user.select("-password")
+                res.json({message: `${user.firstName} is loggedin now.`, user })
+                //res.json(`${user.firstName} is loggedin now.`)
             }
             else {
                 throw new Error("Cannot login the user. Please check credentials.")
@@ -88,14 +89,21 @@ router.delete("/user", async (req, res) => {
 
 module.exports = router;
 
-
+// "emailId": "head@gmail.com",
+// "password": "Head@0512",
 // {       
 //     "emailId": "avi@gmail.com", 
 //"password": "Avinash@301"    
 
 //    "emailId": "prakhar@gmail.com",
 //  "password": "Prakhar@12345"
-//    
+
+
+// "emailId": "jaddu@gmail.com",
+// "password": "Jaddu@0512",
+
+//    "emailId": "boomboom@gmail.com",
+ // "password": "Bumrah@0512",
 //   }
 // {
 // "emailId": "tilak@gmail.com",
