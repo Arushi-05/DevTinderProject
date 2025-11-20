@@ -8,7 +8,7 @@ const authUser = async (req, res, next) => {
     try {
         const { token } = req.cookies
         if (!token) {
-            throw new Error("You need to login first!")
+            return res.status(401).send("Please login!")
         }
         const decodedObj = User.decodeToken(token)
         const user = decodedObj._id;

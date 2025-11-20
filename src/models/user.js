@@ -14,7 +14,7 @@ const userSchema = new Schema({
             }
         }
     },
-    password: { type: String, required: true, trim: true},
+    password: { type: String, required: true, trim: true },
     age: { type: Number, min: 18 },
     gender: {
         type: String, lowercase: true, validate(val) {
@@ -24,6 +24,7 @@ const userSchema = new Schema({
             }
         }
     },
+    photoUrl: { type: String, default: "https://img.freepik.com/premium-vector/man-profile_1083548-15963.jpg?semt=ais_incoming&w=740&q=80" },
     skills: {
         type: [String],
         validate:

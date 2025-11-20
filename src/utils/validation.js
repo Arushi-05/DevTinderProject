@@ -37,7 +37,8 @@ const validateProfileData = (req) => {
         "lastName",
         "age",
         "gender",
-        "skills"
+        "skills",
+        "photoUrl"
     ];
     const data = req.body;
     const isUpdatesAllowed = Object.keys(data).every((k) =>

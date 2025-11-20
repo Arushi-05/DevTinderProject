@@ -39,7 +39,7 @@ router.post("/login", async (req, res) => {
                 console.log("token 2:" + token)
                 res.cookie("token", token)
                 // const data=user.select("-password")
-                res.json({message: `${user.firstName} is loggedin now.`, user })
+                res.json({ user })
                 //res.json(`${user.firstName} is loggedin now.`)
             }
             else {
@@ -57,7 +57,7 @@ router.post("/login", async (req, res) => {
         // }}
     }
     catch (err) {
-        res.status(400).send("ERROR is: " + err.message)
+        res.status(400).send(err.message)
     }
 })
 
@@ -84,8 +84,6 @@ router.delete("/user", async (req, res) => {
     }
 
 })
-
-
 
 module.exports = router;
 
