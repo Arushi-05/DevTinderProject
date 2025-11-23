@@ -5,7 +5,7 @@ const router = express.Router();
 const { validateUser, validateConnectionRequestData, validateDuplicateRequest } = require('../utils/validation')
 const authUser = require('../middlewares/adminAuth');
 const ConnectionRequest = require('../models/connections');
-const USER_SAFE_DATA = "firstName lastName age gender skills";
+const USER_SAFE_DATA = "firstName lastName age gender skills photoUrl";
 
 router.post("/request/send/:status/:toUserId", authUser, async (req, res) => {
     console.log("Route handler started for /request/send");

@@ -34,6 +34,7 @@ router.post("/login", async (req, res) => {
                 throw new Error("User not found!")
             }
             const match = await bcrypt.compare(password, user.password);
+            console.log(user.password)
             if (match) {
                 const token = await user.getJWT()
                 console.log("token 2:" + token)
@@ -90,11 +91,6 @@ module.exports = router;
 // "emailId": "head@gmail.com",
 // "password": "Head@0512",
 // {       
-//     "emailId": "avi@gmail.com", 
-//"password": "Avinash@301"    
-
-//    "emailId": "prakhar@gmail.com",
-//  "password": "Prakhar@12345"
 
 
 // "emailId": "jaddu@gmail.com",
@@ -107,3 +103,8 @@ module.exports = router;
 // "emailId": "tilak@gmail.com",
 //   "password": "Tilak@123"
 // }691683d5ed7c6ed6a89cc4ad
+
+// {
+//     "emailId": "arushi@gmail.com",
+//     "password": "Arushi@05"
+//    }
