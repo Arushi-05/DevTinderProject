@@ -92,6 +92,9 @@ module.exports = router;
 // "password": "Head@0512",
 // {       
 
+//"emailId": "ashwin@gmail.com",
+//"password": "Ashwin@123",
+
 
 // "emailId": "jaddu@gmail.com",
 // "password": "Jaddu@0512",
@@ -104,6 +107,18 @@ module.exports = router;
 //   "password": "Tilak@123"
 // }691683d5ed7c6ed6a89cc4ad
 
+// "emailId": "pant@gmail.com",
+//"password": "Pant@123",
+
+
+// "emailId": "rahul@gmail.com",
+//"password": "Rahul@123"
+
+// "emailId": "jaiswal@gmail.com",
+//"password": "Jaiswal@123"
+
+// "emailId": "axar@gmail.com",
+//"password": "Axar@123"
 // {
 //     "emailId": "arushi@gmail.com",
 //     "password": "Arushi@05"

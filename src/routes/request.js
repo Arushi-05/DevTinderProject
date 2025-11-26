@@ -17,7 +17,6 @@ router.post("/request/send/:status/:toUserId", authUser, async (req, res) => {
         if (await validateDuplicateRequest(req)) {
             throw new Error("The request already exists.")
         }
-
         const toUserId = req.params.toUserId   //user i am interested in
         const fromUserId = req.user._id;  //from authUser
         const status = req.params.status
@@ -52,7 +51,7 @@ router.post("/request/review/:status/:requestId", authUser, async (req, res) => 
         //validate status and requestId(requestId is the id of the connection request dumbo.)
         const { status, requestId } = req.params
         const loggedInUser = req.user._id;  //from authUser, this is user A checking his requests
-        const ALLOWED_STATUSES = ['accepted', "rejected"]
+        const ALLOWED_STATUSES = ["accepted", "rejected"]
         if (!ALLOWED_STATUSES.includes(status)) {
             return res.status(400).json({ message: "This is not a valid status." })
         }
@@ -80,11 +79,60 @@ router.post("/request/review/:status/:requestId", authUser, async (req, res) => 
 
 })
 
+router.get("/request/received", authUser, async (req, res) => {
+    console.log("Route handler started for /request/received");
+    try {
+        
+        const loggedInUser = req.user;  //from authUser, this is user A checking his requests
+
+        const requestsReceived = await ConnectionRequest.find({
+            toUserId: loggedInUser._id,
+            status: "interested"
+
+        }).populate("fromUserId", ["firstName", "lastName", "age", "skills", "photoUrl", "gender"]);
+
+        if (!requestsReceived) {
+            return res.status(404).json({ message: "No connection requests pending." })
+        }
+        res.json({ message: `Data fetched successfully.`, data: requestsReceived })
+
+    } catch (err) {
+        console.error("Error in /request/received route", err.message)
+        res.status(400).send(`${err.message}`)
+    }
+
+})
+
+
+router.get("/connections", authUser, async (req, res) => {
+    console.log("Route handler started for /connections");
+    try {
+        
+        const loggedInUser = req.user;  //from authUser, this is user A checking his requests
+        const requestsAccepted = await ConnectionRequest.find({
+            $or:[{toUserId: loggedInUser._id,status: "accepted"},
+                {fromUserId: loggedInUser._id,status: "accepted"}]
+              //1st -here i am the receiver of requests that are now accepted by me
+                //2nd -here i am the sender of requests that are now accepted by others
+
+        }).populate("fromUserId", ["firstName", "lastName", "age", "gender", "photoUrl", "skills"]);
+
+        if (!requestsAccepted) {
+            return res.status(404).json({ message: "No conections yet!" })
+        }
+        res.json({ message: `Data fetched successfully.`, data: requestsAccepted })
+
+    } catch (err) {
+        console.error("Error in /connections route", err.message)
+        res.status(400).send(`${err.message}`)
+    }
+
+})
 router.get("/feed", authUser, async (req, res) => {
     try {
         const loggedInUser = req.user    //i am loggedin
         const page=parseInt(req.query.page) || 1
-        let limit= parseInt(req.query.limit) || 5
+        let limit= parseInt(req.query.limit) || 100
         const skip= (page-1)*limit
 
         const connectionRequest = await ConnectionRequest.find({
