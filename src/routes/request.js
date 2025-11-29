@@ -10,7 +10,6 @@ const USER_SAFE_DATA = "firstName lastName age gender skills photoUrl";
 router.post("/request/send/:status/:toUserId", authUser, async (req, res) => {
     console.log("Route handler started for /request/send");
     try {
-
         if (!(await validateUser(req))) {
             throw new Error("This is hacker..")
         }
@@ -115,7 +114,8 @@ router.get("/connections", authUser, async (req, res) => {
               //1st -here i am the receiver of requests that are now accepted by me
                 //2nd -here i am the sender of requests that are now accepted by others
 
-        }).populate("fromUserId", ["firstName", "lastName", "age", "gender", "photoUrl", "skills"]);
+        }).populate("fromUserId", ["firstName", "lastName", "age", "gender", "photoUrl", "skills"])
+        .populate("toUserId", ["firstName", "lastName", "age", "gender", "photoUrl", "skills"]);
 
         if (!requestsAccepted) {
             return res.status(404).json({ message: "No conections yet!" })
@@ -140,14 +140,14 @@ router.get("/feed", authUser, async (req, res) => {
         }).select("fromUserId toUserId toFirstName");
         const hiddenUsers = new Set();
         connectionRequest.forEach((req) => {
-            hiddenUsers.add(loggedInUser._id)
+            
             hiddenUsers.add(req.fromUserId.toString())
             hiddenUsers.add(req.toUserId.toString())
         })
         const feed = await User.find({
-            _id: { $nin: Array.from(hiddenUsers) }
+            $and:[{_id: { $nin: Array.from(hiddenUsers) }},{_id: { $ne: loggedInUser._id }}]
+            
         }).select(USER_SAFE_DATA).skip(skip).limit(limit)
-
         res.send(feed)
 
     }
@@ -156,5 +156,4 @@ router.get("/feed", authUser, async (req, res) => {
     }
 
 })
-
 module.exports = router;
