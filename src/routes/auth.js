@@ -13,8 +13,13 @@ router.post("/signup", async (req, res) => {
         const user = new User({
             firstName, lastName, emailId, password: passwordHash, ...otherFields
         })
-        await user.save();
-        res.send("New user added successfully.")
+        const savedUser=await user.save();
+        const token = await savedUser.getJWT()
+                console.log("token 2:" + token)
+                res.cookie("token", token,{expires: new Date(Date.now()+8*3600000)})
+                // const data=user.select("-password")
+                res.json({ message: "New user added successfully.",data:savedUser })
+        //res.send("New user added successfully.")
     }
     catch (err) {
         res.status(400).send(`Error saving the new user:${err.message}`)
